@@ -1,6 +1,7 @@
 import { createStore } from "vuex";
 import User from "@/models/UserModel";
 import axios from "axios";
+import validator from "./utils/validator";
 
 export default createStore({
   strict: true,
@@ -23,7 +24,7 @@ export default createStore({
     deleteUser(state) {
       const id = state.users.findIndex(({ id }) => id === state.currentUser.id);
       if (id + 1) {
-        state.users.splice(id, 1);;
+        state.users.splice(id, 1);
       }
       window.localStorage.setItem("users", JSON.stringify(state.users));
     },
@@ -33,24 +34,24 @@ export default createStore({
     clearCurrentUser(state) {
       state.currentUser = {} as User;
     },
-    // saveUsers(state) {
-    //   window.localStorage.setItem("users", JSON.stringify(state.users));
-    // },
   },
   actions: {
     async fetchUsers({ commit }) {
       return axios
         .get("https://reqres.in/api/users?page=2")
         .then(({ data }) => {
-          commit("setUsers", data.data);
+          const validData = data.data.filter((item: User) => {
+            return validator(item);
+          });
+          commit("setUsers", validData);
         })
         .catch((e) => e);
     },
     getUsers({ commit }) {
-      const rawLocalUsers = window.localStorage.getItem('users');
+      const rawLocalUsers = window.localStorage.getItem("users");
       if (rawLocalUsers) {
         const localUsers = JSON.parse(rawLocalUsers);
-        commit('setUsers', localUsers);
+        commit("setUsers", localUsers);
       }
     },
   },
