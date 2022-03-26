@@ -9,6 +9,7 @@
         @click="showModal(user.id)"
       />
     </transition-group>
+    <EmptyUsersBlock v-if="!users.length" />
     <Modal
       v-if="isModalVisible"
       v-model:user="currentUser"
@@ -22,6 +23,7 @@ import { defineComponent } from "vue";
 import Store from "@/store";
 import Card from "./Card.vue";
 import Modal from "./Modal.vue";
+import EmptyUsersBlock from "./EmptyUsersBlock.vue";
 import User from "@/models/UserModel";
 
 export default defineComponent({
@@ -38,7 +40,7 @@ export default defineComponent({
   async beforeCreate() {
     await Store.dispatch("getUsers");
   },
-  components: { Card, Modal },
+  components: { Card, Modal, EmptyUsersBlock },
   computed: {
     users() {
       return Store.state.users;
